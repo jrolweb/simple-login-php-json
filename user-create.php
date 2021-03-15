@@ -1,18 +1,21 @@
 <?php
 require_once('functions.php');
 session_start();
+global $message_code;
 $return = false;
-
-if(isset($_POST['login'])) {
-    $user = $_POST['user'];
-    $pass = md5($_POST['password']);
-    $return = login($user, $pass);
-}
 
 if(isset($_POST['logout'])) {
     session_destroy();
     header("Refresh:0");
 }
+
+if(isset($_POST['create'])) {
+    $user = $_POST['user'];
+    $pass = md5($_POST['password']);
+    $type = $_POST['type'];
+    $return = user_create($user, $pass, $type);
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -36,33 +39,41 @@ if(isset($_POST['logout'])) {
             Logged: <?php echo $_SESSION['user'] ?> <br />
             Type user: <?php echo $_SESSION['type_user'] ?>
         </p>
+
+        <h2>Create User</h2>
+        <?php
+            if($_SESSION['type_user'] == 'adm'):
+        ?>
+        <form action="" method="post">
+            <input type="email" name="user" placeholder="email@test.com" required />
+            <input type="password" name="password" placeholder="******" required />
+            <select name="type" required>
+                <option value="">User type</option>
+                <option value="adm">Adm</option>
+                <option value="user">User</option>
+            </select>
+            <input type="submit" name="create" value="Create" />
+        </form>
+        <?php
+                if($return){
+                    echo '<p>'.$return.'</p>';
+                };
+                
+            else:
+                echo '<p>'.$message_code['8'].'</p>';
+            endif;
+        ?>
+
         <a href="users.php">View users</a>
+        <a href="index.php">Home</a>
 
         <form action="" method="post">
             <input type="submit" name="logout" value="Logout" />
         </form>
         <?php
         else:
-    ?>
-        <form action="" method="post">
-            <input type="email" name="user" placeholder="email@test.com" required />
-            <input type="password" name="password" placeholder="******" required />
-            <input type="submit" name="login" value="Login" />
-        </form>
-        <?php
-            if($return){
-                echo $return;
-            }
-        ?>
-        <p>
-            Use for first access:
-        </p>
-        <p>
-            <bold>Email:</bold> test@test.com <br />
-            <bold>Password:</bold> passtest
-        </p>
-        <?php
-    endif;
+            header("location: index.php");
+        endif;
     ?>
         <div class="readme">
             <h1>README.md</h1>

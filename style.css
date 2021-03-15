@@ -1,0 +1,27 @@
+body {
+    font-family: "Trebuchet MS"
+}
+
+#page {
+    max-width: 1200px;
+    margin: auto;
+}
+
+.readme {
+    padding: 10px 20px;
+    background: #ddd;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    margin-top: 50px;
+}
+
+form {
+    margin: 20px 0;
+}
+
+input, select {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+}
+

@@ -2,17 +2,20 @@
 require_once('functions.php');
 session_start();
 $return = false;
+global $message_code;
 
-if(isset($_POST['login'])) {
-    $user = $_POST['user'];
-    $pass = md5($_POST['password']);
-    $return = login($user, $pass);
-}
+$user_exclude = $_GET['user'];
+
 
 if(isset($_POST['logout'])) {
     session_destroy();
     header("Refresh:0");
 }
+
+if(isset($_POST['exclude'])) {
+    $return = user_exclude($user_exclude);
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -36,33 +39,43 @@ if(isset($_POST['logout'])) {
             Logged: <?php echo $_SESSION['user'] ?> <br />
             Type user: <?php echo $_SESSION['type_user'] ?>
         </p>
-        <a href="users.php">View users</a>
+
+        <h2>Exclude User</h2>
+
+        <p><?php echo $user_exclude; ?></p>
+        <?php 
+            if($_SESSION['user'] == $user_exclude):
+        ?>
+        <p><?php echo $message_code['6'] ?></p>
+        <?php
+            else:
+                if($_SESSION['type_user'] == 'adm'):
+                    if(!$return):
+            ?>
+        <form action="" method="post">
+            <input type="submit" name="exclude" value="Confirm exclude" />
+        </form>
+        <?php
+                    else:
+                        echo '<p>'.$return.'</p>';
+            ?>
+        <?php
+                    endif;
+                else:
+                    echo '<p>'.$message_code['9'].'</p>';
+                endif;
+            endif;
+        ?>
+        <a href="users.php">Users</a>
+        <a href="index.php">Home</a>
 
         <form action="" method="post">
             <input type="submit" name="logout" value="Logout" />
         </form>
         <?php
         else:
-    ?>
-        <form action="" method="post">
-            <input type="email" name="user" placeholder="email@test.com" required />
-            <input type="password" name="password" placeholder="******" required />
-            <input type="submit" name="login" value="Login" />
-        </form>
-        <?php
-            if($return){
-                echo $return;
-            }
-        ?>
-        <p>
-            Use for first access:
-        </p>
-        <p>
-            <bold>Email:</bold> test@test.com <br />
-            <bold>Password:</bold> passtest
-        </p>
-        <?php
-    endif;
+            header("location: index.php");
+        endif;
     ?>
         <div class="readme">
             <h1>README.md</h1>

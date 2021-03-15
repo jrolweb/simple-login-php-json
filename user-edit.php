@@ -2,17 +2,26 @@
 require_once('functions.php');
 session_start();
 $return = false;
+global $message_code;
 
-if(isset($_POST['login'])) {
-    $user = $_POST['user'];
-    $pass = md5($_POST['password']);
-    $return = login($user, $pass);
-}
+$user_edit = $_GET['user'];
+
 
 if(isset($_POST['logout'])) {
     session_destroy();
     header("Refresh:0");
 }
+
+if(isset($_POST['edit'])) {
+    if(empty($_POST['password'])){
+        $pass = false;
+    }else{
+        $pass = md5($_POST['password']);
+    }
+    $type = isset($_POST['type']) ? $_POST['type'] : $_SESSION['type_user'];
+    $return = user_edit($user_edit, $pass, $type);
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -36,33 +45,61 @@ if(isset($_POST['logout'])) {
             Logged: <?php echo $_SESSION['user'] ?> <br />
             Type user: <?php echo $_SESSION['type_user'] ?>
         </p>
-        <a href="users.php">View users</a>
+
+        <h2>Edit User</h2>
+        <?php 
+            if($_SESSION['user'] == $user_edit):
+        ?>
+        <form action="" method="post">
+            <input type="email" name="user_edit" value="<?php echo $_SESSION['user'] ?>" disabled />
+            <input type="password" name="password" placeholder="New password" />
+            <select name="type" disabled>
+                <option value="<?php echo $_SESSION['type_user'] ?>" selected><?php echo $_SESSION['type_user'] ?>
+                </option>
+                <option value="adm">Adm</option>
+                <option value="user">User</option>
+            </select>
+            <input type="submit" name="edit" value="Save" />
+        </form>
+        <?php 
+                if($return){
+                    echo '<p>'.$return.'</p>';
+                };
+
+            elseif($_SESSION['type_user'] == 'adm'):
+                $user_edit_data = get_user($user_edit);
+        ?>
+        <form action="" method="post">
+            <input type="email" name="user_edit" value="<?php echo $user_edit ?>" disabled />
+            <input type="password" name="password" placeholder="New password" />
+            <select name="type">
+                <option value="<?php echo $user_edit_data['type']; ?>" selected ><?php echo $user_edit_data['type']; ?>
+                </option>
+                <option value="adm">adm</option>
+                <option value="user">user</option>
+            </select>
+            <input type="submit" name="edit" value="Save" />
+        </form>
+        <?php 
+                if($return){
+                    echo '<p>'.$return.'</p>';
+                };
+
+            else:
+                echo '<p>'.$message_code['10'].'</p>';
+            endif;
+        ?>
+
+        <a href="users.php">Users</a>
+        <a href="index.php">Home</a>
 
         <form action="" method="post">
             <input type="submit" name="logout" value="Logout" />
         </form>
         <?php
         else:
-    ?>
-        <form action="" method="post">
-            <input type="email" name="user" placeholder="email@test.com" required />
-            <input type="password" name="password" placeholder="******" required />
-            <input type="submit" name="login" value="Login" />
-        </form>
-        <?php
-            if($return){
-                echo $return;
-            }
-        ?>
-        <p>
-            Use for first access:
-        </p>
-        <p>
-            <bold>Email:</bold> test@test.com <br />
-            <bold>Password:</bold> passtest
-        </p>
-        <?php
-    endif;
+            header("location: index.php");
+        endif;
     ?>
         <div class="readme">
             <h1>README.md</h1>
